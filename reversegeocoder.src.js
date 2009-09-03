@@ -1,3 +1,5 @@
+// http://github.com/straup/js-reversegeocoder/tree/master
+
 if (! info){
     var info = {};
 }
@@ -127,6 +129,11 @@ info.aaronland.geo.ReverseGeocoder.prototype.reverse_geocode = function(pt, doTh
                 return;
             }
 
+            else if (provider == 'google'){
+                _self._google();
+                return;
+            }
+
             else {
                 _self.error('unknown provider');
                 return;
@@ -137,15 +144,52 @@ info.aaronland.geo.ReverseGeocoder.prototype.reverse_geocode = function(pt, doTh
     return;
 };
 
-info.aaronland.geo.ReverseGeocoder.prototype._flickr = function(){
+info.aaronland.geo.ReverseGeocoder.prototype._google = function(){
 
-    var pt = this.current_query;
+    // http://www.flickr.com/services/api/flickr.places.findByLatLon.html
 
-    if ((parseInt(pt['lat']) == 0) && (parseInt(pt['lon']) == 0)){
-        this.error();
+    if (! this.capabilities.has_google){
+        this.error('missing libraries');
         return;
     }
 
+    var pt = this.current_query;
+    var _self = this;
+
+    var _geocodeComplete = function(results, status) {
+
+        if (status != google.maps.GeocoderStatus.OK){
+            _self.error('server error');
+            return;
+        }
+
+        if ((! results) || (! results.length)){
+            _self.error('no results');
+            return;
+        }
+        
+        var addr = results[0].formatted_address;
+
+        _self.success(0, addr);
+        return;
+    };
+
+    var latlng = new google.maps.LatLng(pt['lat'], pt['lon'], 16);
+
+    var goog = new google.maps.Geocoder();
+    goog.geocode({'latLng' : latlng}, _geocodeComplete);
+};
+
+info.aaronland.geo.ReverseGeocoder.prototype._flickr = function(){
+
+    // http://code.google.com/apis/maps/documentation/v3/reference.html#Geocoder
+
+    if (! this.capabilities.has_flickr){
+        this.error('missing flickr libraries or api key');
+        return;
+    }
+
+    var pt = this.current_query;
     var _self = this;
 
     window['_reverseGeocodeComplete'] = function(rsp){

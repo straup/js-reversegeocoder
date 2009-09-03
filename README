@@ -1,1 +1,89 @@
-Please, write me...
+This is a simple wrapper JavaScript library to provide a single interface for a
+variety of third-party reverse geocoding services.
+
+Additionally, you can specify multiple providers in a single request each of
+which will be tried until one returns a successful response.
+
+Like this:
+
+	var doThisOnSuccess = function(rsp){
+		var div = document.getElementById('output');
+		div.innerHTML = rsp['provider'] + ' says you\'re in: ' + rsp['name'];
+	};
+
+	var doThisIfNot = function(rsp){
+		var div = document.getElementById('output');          	
+		div.innerHTML = rsp['message'];
+	};
+
+	var args = {
+        	'providers' : [ 'flickr', 'google' ],
+		'enable_logging' : true,
+		'flickr_apikey' : 'YER_API_KEY',
+	};
+
+	var pt = {'lat' : lat, 'lon' : lon, 'zoom': 16};
+
+	var geo = new info.aaronland.geo.ReverseGeocoder(args);
+	geo.reverse_geocode(pt, doThisOnSuccess, doThisIfNot);
+
+You can also not pass a list of 'providers' and have the package define its own
+list based on the availability of client libraries and things like API keys. The
+order of precedence for automagic 'provider' lists is:
+
+	* Flickr
+
+	* Google
+
+Here's a complete example using the js-geolocation libary [1] to reverse geocode
+the user's current location:
+
+	var geoloc_doThisOnSuccess = function(lat, lon){
+          
+		var reversegeo_doThisOnSuccess = function(rsp){
+			var div = document.getElementById('output');
+			div.innerHTML = rsp['provider'] + ' says you\'re in: ' + rsp['name'] + ' w/ UUID ' + rsp['uuid'];
+		};
+
+		var reversegeo_doThisIfNot = function(rsp){
+			var div = document.getElementById('output');          	
+			div.innerHTML = rsp['message'];
+		};
+
+	        var reversegeo_args = {
+			'enable_logging' : true,
+			'flickr_apikey' : 'YER_API_KEY',
+		};
+
+		var pt = {'lat' : lat, 'lon' : lon, 'zoom': 16};
+
+		var geo = new info.aaronland.geo.ReverseGeocoder(reversegeo_args);
+		geo.reverse_geocode(pt, reversegeo_doThisOnSuccess, reversegeo_doThisIfNot);
+	};
+
+	var geoloc_doThisIfNot = function(err){
+		alert('failed to determine user\'s location: ' + err);
+	};
+
+	var geoloc_args = {
+		'enable_logging' : true,
+	}
+
+	var loc = new info.aaronland.geo.Location(geoloc_args);
+	loc.findMyLocation(geoloc_doThisOnSuccess, geoloc_doThisIfNot);
+
+That's pretty much all the interface will ever look like. As of this writing it
+mostly works but it's also incomplete and there are probably bugs.
+
+Currently supported providers are:
+
+	* Flickr (http://github.com/straup/js-flickr-api/tree/master)
+
+	* Google (http://code.google.com/apis/maps/documentation/v3)
+
+Note that you will need to include the service-specific JavaScript libraries
+yourself.
+
+--
+
+[1] http://github.com/straup/js-geolocation/tree/master
