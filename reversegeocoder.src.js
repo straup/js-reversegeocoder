@@ -37,11 +37,11 @@ info.aaronland.geo.ReverseGeocoderCapabilities = function(args){
 
     if (typeof(info.aaronland.flickr) == 'object'){
         this.has_flickr = 1;
-        this.can_geocode += 1;
+        this.can_reverse_geocode += 1;
 
         if ((args) && (! args['flickr_apikey'])){
             this.has_flickr = 0;
-            this.can_geocode -= 1;
+            this.can_reverse_geocode -= 1;
         }
 
         else {
@@ -53,7 +53,7 @@ info.aaronland.geo.ReverseGeocoderCapabilities = function(args){
 
     if (typeof(google) == 'object'){
         this.has_google = 1;
-        this.can_geocode += 1;
+        this.can_reverse_geocode += 1;
 
         this.providers.push('google');
     }
