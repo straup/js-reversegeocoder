@@ -87,7 +87,7 @@ info.aaronland.geo.ReverseGeocoder = function(args){
 
 info.aaronland.geo.ReverseGeocoder.prototype.reverse_geocode = function(pt, doThisOnSuccess, doThisIfNot, idx){
 
-    if (this.timer_reversegeo) {
+    if (this.timer_reversegeo){
         this.log("terminating previously running reverse geocoder");
 
         clearTimeout(this.timer_reversegeo);
@@ -99,13 +99,15 @@ info.aaronland.geo.ReverseGeocoder.prototype.reverse_geocode = function(pt, doTh
         return;
     }
 
+    if (typeof(idx) == 'undefined'){
+        idx = 0;
+    }
+
+    var delay = (idx == 0) ? 1500 : 0;
+
     var _self = this;
 
     this.timer_reversegeo = setTimeout(function(){
-
-            if (typeof(idx) == 'undefined'){
-                idx = 0;
-            }
             
             var provider = _self.providers[ idx ];
 
@@ -143,7 +145,7 @@ info.aaronland.geo.ReverseGeocoder.prototype.reverse_geocode = function(pt, doTh
                 return;
             }
 
-        }, 1500);
+        }, delay);
 
     return;
 };
